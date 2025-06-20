@@ -1,6 +1,10 @@
 hydra:
   searchpath:
     - file://mdlm/configs
+  run:
+    dir: ./outputs/${fk_steering.potential_type}_${fk_steering.k_particles}_${fk_steering.lmbda}_${fk_steering.reward_fn}_${fk_steering.reward_label}_${fk_steering.resample_frequency}_${fk_steering.num_x0_samples}/${now:%Y.%m.%d}/${now:%H%M%S}
+  job:
+    chdir: true
 
 defaults:
   - config  # Refers to 'config.yaml' inside 'mdlm/configs'

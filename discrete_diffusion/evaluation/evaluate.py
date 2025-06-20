@@ -322,12 +322,13 @@ def main(generations_file, output_file, metrics, extra):
                 print(f'dist-{i+1} = {dist_n}')
 
     if "toxic" in metricset:
-        if 'negative' in generations_file:
-            acc = compute_toxic(generations_df, 0)
-        elif 'positive' in generations_file:
-            acc = compute_toxic(generations_df, 1)
-        else:
-            raise ValueError("check ctridx")
+        acc = compute_toxic(generations_df, 1)
+        #if 'negative' in generations_file:
+        #    acc = compute_toxic(generations_df, 0)
+        #elif 'positive' in generations_file:
+        #    acc = compute_toxic(generations_df, 1)
+        #else:
+        #    raise ValueError("check ctridx")
 
         # write output results
         with open(output_dir / output_file, 'a') as fo:
@@ -335,12 +336,13 @@ def main(generations_file, output_file, metrics, extra):
             print(f'toxic acc = {acc}')
 
     if "toxic_ext" in metricset:
-        if 'negative' in generations_file:
-            acc = compute_toxic_ext(generations_df, 0)
-        elif 'positive' in generations_file:
-            acc = compute_toxic_ext(generations_df, 1)
-        else:
-            raise ValueError("check ctridx")
+        acc = compute_toxic_ext(generations_df, 1)
+        #if 'negative' in generations_file:
+        #    acc = compute_toxic_ext(generations_df, 0)
+        #elif 'positive' in generations_file:
+        #    acc = compute_toxic_ext(generations_df, 1)
+        #else:
+        #    raise ValueError("check ctridx")
 
         # write output results
         with open(output_dir / output_file, 'a') as fo:

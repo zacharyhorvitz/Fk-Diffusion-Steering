@@ -199,6 +199,10 @@ class FKD:
         w = torch.clamp(w, 0, 1e10)
         w[torch.isnan(w)] = 0.0
 
+        # if all 0, set w to 1
+        if w.sum() == 0:
+            w = torch.ones_like(w)
+
         # If we are using adaptive resampling, check if we need to resample
         if self.adaptive_resampling or (
             at_terminal_sample and self.adaptive_resample_at_end
@@ -231,7 +235,6 @@ class FKD:
                 self.population_rs = rs_candidates
 
         else:
-            # Resample indices based on weights
             indices = torch.multinomial(
                 w, num_samples=self.num_particles, replacement=True
             )

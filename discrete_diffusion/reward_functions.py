@@ -19,6 +19,18 @@ MODELS = {}
 
 INFINIGRAM_CACHE_DIR = '/mnt/swordfish-pool2/horvitz/infinigram/v4_dolmasample_olmo'
 
+def logmeanexp(scores):
+    if not isinstance(scores, torch.Tensor):
+        tensor_scores = torch.tensor(scores)
+    else:
+        tensor_scores = scores
+
+    result = torch.logsumexp(tensor_scores, dim=-1) - np.log(tensor_scores.shape[-1])
+
+    if not isinstance(scores, torch.Tensor):
+        return result.tolist()
+    else:
+        return result
 
 def _compute_roberta_score(
     *,
@@ -32,6 +44,9 @@ def _compute_roberta_score(
     batch_size=8,
     max_length=512,
 ):
+    """
+    Compute log mean probability of the label for each text.
+    """
     # get individual texts
     all_texts = []
     original_indices = []
@@ -71,13 +86,14 @@ def _compute_roberta_score(
         ].tolist()
         all_scores.extend(scores)
 
-    # average the scores
+    # average the log scores
     unreduced_per_text_scores = [[] for _ in range(len(texts))]
     for i, score in zip(original_indices, all_scores):
         unreduced_per_text_scores[i].append(score)
 
-    avg_scores = [np.mean(scores) for scores in unreduced_per_text_scores]
-
+    # avg_scores = [np.mean(scores) for scores in unreduced_per_text_scores]
+   
+    avg_scores = [logmeanexp(scores) for scores in unreduced_per_text_scores]
     return avg_scores, unreduced_per_text_scores
 
 
@@ -402,7 +418,8 @@ def gpt2_perp_score(
     for i, score in zip(original_indices, perps):
         unreduced_per_text_scores[i].append(-1 * score)
 
-    avg_scores = [np.mean(scores) for scores in unreduced_per_text_scores]
+    # avg_scores = [np.mean(scores) for scores in unreduced_per_text_scores]
+    avg_scores = [logmeanexp(scores) for scores in unreduced_per_text_scores]
 
     return avg_scores, unreduced_per_text_scores
 
@@ -471,9 +488,11 @@ Example cmd: `aws s3 cp --no-sign-request --recursive s3://infini-gram-lite/inde
                 prompt_ids=input_ids[max(0, i - max_ngram) : i], cont_id=input_ids[i]
             )['prob']
             if raw_prob < very_small_number:
+                # smooth
                 raw_prob = very_small_number
             probs.append(raw_prob)
 
+        # technically this is log perplexity
         perp = -1 * np.mean(np.log(probs))
         perps.append(perp)
 
@@ -482,7 +501,8 @@ Example cmd: `aws s3 cp --no-sign-request --recursive s3://infini-gram-lite/inde
     for i, score in zip(original_indices, perps):
         unreduced_per_text_scores[i].append(-1 * score)
 
-    avg_scores = [np.mean(scores) for scores in unreduced_per_text_scores]
+    # avg_scores = [np.mean(scores) for scores in unreduced_per_text_scores]
+    avg_scores = [logmeanexp(scores) for scores in unreduced_per_text_scores]
 
     return avg_scores, unreduced_per_text_scores
 
@@ -496,16 +516,16 @@ if __name__ == '__main__':
         'a he she a ate them',
     ]
 
-    # avg_scores, _ = sentiment_score(texts=texts, label='positive', just_first=False)
-    # print(avg_scores)
-    # assert avg_scores[2] < avg_scores[0] < avg_scores[1]
+    avg_scores, _ = sentiment_score(texts=texts, label='positive', just_first=False)
+    print(avg_scores)
+    assert avg_scores[2] < avg_scores[0] < avg_scores[1]
 
-    # avg_scores, _ = toxicity_score(texts=texts, label='positive')
-    # print(avg_scores)
+    avg_scores, _ = toxicity_score(texts=texts, label='positive')
+    print(avg_scores)
 
-    # avg_scores, _ = formality_score(texts=texts, label='formal')
-    # print(avg_scores)
-    # assert avg_scores[0] > avg_scores[-2]
+    avg_scores, _ = formality_score(texts=texts, label='formal')
+    print(avg_scores)
+    assert avg_scores[0] > avg_scores[-2]
 
     avg_scores, _ = gpt2_perp_score(texts=texts)
     print(avg_scores)

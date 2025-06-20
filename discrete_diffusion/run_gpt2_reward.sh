@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# BoN 4 particles
-python generate_with_fk.py \
-	seed=1234 \
-	eval.checkpoint_path=kuleshov-group/mdlm-owt \
+for seed in 1234 2345 3456; do
+
+	# BoN 4 particles
+	python generate_with_fk.py \
+		seed=$seed \
+		eval.checkpoint_path=kuleshov-group/mdlm-owt \
 		data=openwebtext-split  \
 		model.length=128  \
 		sampling.predictor=ddpm  \
@@ -22,11 +24,11 @@ python generate_with_fk.py \
 		fk_steering.resample_start_step=-1 \
 		sampling.prompt_file=$(pwd)/evaluation/pplm_discrim_prompts_orig.jsonl
 
-# FK 4 particles
-python generate_with_fk.py \
-	seed=1234 \
-	eval.checkpoint_path=kuleshov-group/mdlm-owt \
-		data=openwebtext-split  \
+	# FK 4 particles
+	python generate_with_fk.py \
+		seed=$seed \
+		eval.checkpoint_path=kuleshov-group/mdlm-owt \
+			data=openwebtext-split  \
 		model.length=128  \
 		sampling.predictor=ddpm  \
 		sampling.steps=1000 \
@@ -44,11 +46,11 @@ python generate_with_fk.py \
 		fk_steering.resample_start_step=-1 \
 		sampling.prompt_file=$(pwd)/evaluation/pplm_discrim_prompts_orig.jsonl
 
-# BoN 8 particles
-python generate_with_fk.py \
-	seed=1234 \
-	eval.checkpoint_path=kuleshov-group/mdlm-owt \
-		data=openwebtext-split  \
+	# BoN 8 particles
+	python generate_with_fk.py \
+		seed=$seed \
+		eval.checkpoint_path=kuleshov-group/mdlm-owt \
+			data=openwebtext-split  \
 		model.length=128  \
 		sampling.predictor=ddpm  \
 		sampling.steps=1000 \
@@ -66,11 +68,11 @@ python generate_with_fk.py \
 		fk_steering.resample_start_step=-1 \
 		sampling.prompt_file=$(pwd)/evaluation/pplm_discrim_prompts_orig.jsonl
 
-# FK 8 particles
-python generate_with_fk.py \
-	seed=1234 \
-	eval.checkpoint_path=kuleshov-group/mdlm-owt \
-		data=openwebtext-split  \
+	# FK 8 particles
+	python generate_with_fk.py \
+		seed=$seed \
+		eval.checkpoint_path=kuleshov-group/mdlm-owt \
+			data=openwebtext-split  \
 		model.length=128  \
 		sampling.predictor=ddpm  \
 		sampling.steps=1000 \
@@ -87,3 +89,5 @@ python generate_with_fk.py \
 		fk_steering.num_x0_samples=4 \
 		fk_steering.resample_start_step=-1 \
 		sampling.prompt_file=$(pwd)/evaluation/pplm_discrim_prompts_orig.jsonl
+
+done

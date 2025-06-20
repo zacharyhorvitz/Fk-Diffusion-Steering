@@ -2,9 +2,9 @@
 
 set -ex
 
-python mdlm_to_eval_format.py --glob_expression "../outputs/openwebtext-train/*/*/*/sample_evaluation/*/text_samples.jsonl"
+python mdlm_to_eval_format.py --glob_expression "../outputs/*/*/*/*/sample_evaluation/*/text_samples.jsonl"
 
-for path in ../outputs/openwebtext-train/*/*/fk_steering/sample_evaluation/*/*_gen.jsonl
+for path in ../outputs/*/*/*/fk_steering/sample_evaluation/*/*_gen.jsonl
 do
     echo $path
     fname=$(basename $path)
